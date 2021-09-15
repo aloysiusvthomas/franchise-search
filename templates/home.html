@@ -145,7 +145,6 @@
                 that.response = "";
                 that.loading = true;
                 const csrftoken = getCookie('csrftoken');
-                alert(that.block);
                 if (that.searchQuery) {
                     axios.get("/api/franchise/?search=" + that.searchQuery + "&block=" + that.block)
                         .then(response => {
