@@ -13,7 +13,7 @@ class Ward(models.Model):
     panchayat = models.ForeignKey(to=Panchayat, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.name
+        return f"{self.panchayat} Ward {self.name}"
 
 
 class Franchise(models.Model):
