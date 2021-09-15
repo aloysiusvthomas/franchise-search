@@ -4,7 +4,7 @@ from rest_framework.generics import ListAPIView
 from franchise.api.serializers import BlockSerializer
 from franchise.api.serializers import FranchiseSerializer
 from franchise.api.serializers import PanchayatSerializer
-from franchise.models import Block
+from franchise.models import Ward
 from franchise.models import Franchise
 from franchise.models import Panchayat
 
@@ -18,7 +18,7 @@ class PanchayatListAPIView(ListAPIView):
 class BlockListAPIView(ListAPIView):
     permission_classes = ()
     serializer_class = BlockSerializer
-    queryset = Block.objects.all()
+    queryset = Ward.objects.all()
     filterset_fields = ['panchayat']
 
 

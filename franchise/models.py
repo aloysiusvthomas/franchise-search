@@ -8,7 +8,7 @@ class Panchayat(models.Model):
         return self.name
 
 
-class Block(models.Model):
+class Ward(models.Model):
     name = models.CharField(max_length=256)
     panchayat = models.ForeignKey(to=Panchayat, on_delete=models.CASCADE)
 
@@ -24,7 +24,7 @@ class Franchise(models.Model):
         (EXIST, 'Exist'),
     )
     name = models.CharField(max_length=256)
-    block = models.ForeignKey(to=Block, on_delete=models.CASCADE)
+    block = models.ForeignKey(to=Ward, on_delete=models.CASCADE)
     status = models.CharField(choices=STATUS, max_length=8)
 
     def __str__(self):

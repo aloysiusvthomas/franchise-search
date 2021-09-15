@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from franchise.models import Block
+from franchise.models import Ward
 from franchise.models import Franchise
 from franchise.models import Panchayat
 
@@ -16,7 +16,7 @@ class PanchayatSerializer(serializers.ModelSerializer):
 
 class BlockSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Block
+        model = Ward
         fields = [
             "name",
             "id"
