@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Search</title>
+    <!-- Latest compiled and minified CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+
+</head>
+<body>
+<div class="container mt-5" id="search">
+    <div class="p-5">
+        <h1>Search</h1>
+
+        <p class="alert alert-danger" v-if="response.detail">[[response.detail]]</p>
+        <div class="mb-3">
+            <label class="form-label">Panchayat</label>
+            <select class="form-select" aria-label="Default select example" v-model="panchayat" @change="getBlock">
+                <option value="">Select Panchayat...</option>
+                <option v-for="(panchayat, index) in panchayats" :value="panchayat.id">[[panchayat.name]]</option>
+            </select>
+        </div>
+        <div class="mb-3" v-if="panchayat">
+            <label class="form-label">Block</label>
+            <select class="form-select" aria-label="Default select example" v-model="block">
+                <option value="">Select Block...</option>
+                <option v-for="(block, index) in blocks" :value="block.id">[[block.name]]</option>
+            </select>
+        </div>
+        <div class="mb-3" v-if="block">
+            <label class="form-label" for="search">Search</label>
+            <input type="text" class="form-control" id="search" v-model="searchQuery">
+            <p class=" small text-danger mt-1" v-if="error">[[error]]</p>
+        </div>
+        <button @click="search" class="btn btn-primary" v-if="!loading && block">Search</button>
+        <div v-if="loading">
+            <div class="spinner-border" role="status">
+                <span class="sr-only"></span>
+            </div>
+        </div>
+    </div>
+    <div class="pt-5 p-5" v-if="result">
+        <h3>Result</h3>
+        <div class="card p-5" v-for="(franchise, index) in result">
+            <p><b>Franchise:</b> [[franchise.name]]</p>
+            <p><b>Status:</b> [[franchise.status]]</p>
+        </div>
+        <div v-if="result.length==0" class="card p-5">
+            <p><b>Franchise:</b> [[searchQuery]]</p>
+            <p><b>Status:</b> Not Exist</p>
+        </div>
+    </div>
+
+</div>
+
+</body>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ"
+        crossorigin="anonymous"></script>
+
+{% if debug %}
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+{% else %}
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+{% endif %}
+
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+<script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+
+    }
+
+    axios.defaults.xsrfHeaderName = "X-CSRFTOKEN";
+    axios.defaults.xsrfCookieName = "csrftoken";
+
+    let app = new Vue({
+        el: '#search',
+        delimiters: ['[[', ']]'],
+        data: {
+            panchayat: "",
+            panchayats: "",
+            block: "",
+            blocks: "",
+            searchQuery: "",
+            result: "",
+            loading: false,
+            error: "",
+            response: ""
+        },
+        created() {
+            this.getPanchayat()
+        },
+        methods: {
+            getPanchayat() {
+                const that = this;
+                that.loading = true;
+                axios.get("/api/panchayat/")
+                    .then(response => {
+                        that.panchayats = response.data;
+                        that.loading = false;
+                    })
+                    .catch(error => {
+                        that.loading = false;
+                    });
+
+            },
+            getBlock() {
+                const that = this;
+                that.result = "";
+                that.block = "";
+                that.searchQuery = "";
+                that.loading = true;
+                axios.get("/api/block/?panchayat=" + that.panchayat)
+                    .then(response => {
+                        that.blocks = response.data;
+                        that.loading = false;
+                    })
+                    .catch(error => {
+                        that.loading = false;
+                    });
+
+            },
+            search() {
+                const that = this;
+                that.response = "";
+                that.loading = true;
+                const csrftoken = getCookie('csrftoken');
+                alert(that.block);
+                if (that.searchQuery) {
+                    axios.get("/api/franchise/?search=" + that.searchQuery + "&block=" + that.block)
+                        .then(response => {
+                            that.result = response.data;
+                            that.loading = false;
+                        })
+                        .catch(error => {
+                            that.loading = false;
+                            that.response = error.response.data;
+                        });
+                } else {
+                    that.loading = false;
+                    that.error = "this field is required"
+                }
+
+
+            },
+        }
+    })
+
+</script>
+</html>
