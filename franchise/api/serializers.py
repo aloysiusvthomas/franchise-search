@@ -1,8 +1,7 @@
 from rest_framework import serializers
 
-from franchise.models import Ward
-from franchise.models import Franchise
 from franchise.models import Panchayat
+from franchise.models import Ward
 
 
 class PanchayatSerializer(serializers.ModelSerializer):
@@ -15,21 +14,12 @@ class PanchayatSerializer(serializers.ModelSerializer):
 
 
 class BlockSerializer(serializers.ModelSerializer):
+    franchise_status = serializers.CharField(source="get_franchise_status_display")
+
     class Meta:
         model = Ward
         fields = [
             "name",
-            "id"
-        ]
-
-
-class FranchiseSerializer(serializers.ModelSerializer):
-    status = serializers.CharField(source="get_status_display")
-
-    class Meta:
-        model = Franchise
-        fields = [
-            "name",
             "id",
-            "status",
+            "franchise_status"
         ]
