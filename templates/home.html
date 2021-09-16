@@ -26,7 +26,7 @@
         </div>
         <div class="mb-3" v-if="panchayat">
             <label class="form-label">Ward</label>
-            <select class="form-select" aria-label="Default select example" v-model="ward">
+            <select class="form-select" aria-label="Default select example" v-model="ward" @change="result=''">
                 <option value="">Select Block...</option>
                 <option v-for="(ward, index) in wards" :value="ward.id">[[ward.name]]</option>
             </select>
